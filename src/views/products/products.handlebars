@@ -1,0 +1,110 @@
+<nav class="d-flex flex-column container">
+    <div>
+        <button class="btn btn-primary" data-bs-toggle="collapse" href="#categoriesCollapse" role="button"
+            aria-expanded="false" aria-controls="multiCollapseExample1">Filtros</button>
+    </div>
+    <div class="collapse multi-collapse" id="categoriesCollapse">
+        <div class="rounded bg-light">
+            <div class="p-2 dropdown">
+                <h6 class="btn btn-secondary dropdown-toggle" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">Ordenar por</h6>
+                <ul class="dropdown-menu">
+                    <li><a id="linkDesc" class="dropdown-item" href="">Mayor precio</a></li>
+                    <li><a id="linkAsc" class="dropdown-item" href="">Menor precio</a></li>
+                </ul>
+            </div>
+            <div class="p-2 dropdown">
+                <h6 class="btn btn-secondary dropdown-toggle" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">Categorias</h6>
+                <ul class="dropdown-menu">
+                    <li><a id="category-hogar" class="dropdown-item" href="">Hogar</a></li>
+                    <li><a id="category-dormitorio" class="dropdown-item" href="">Dormitorio</a>
+                    </li>
+                    <li><a id="category-jardin" class="dropdown-item" href="">Jardin</a></li>
+                    <li><a id="category-escritorios" class="dropdown-item" href="">Escritorios</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="p-2 dropdown">
+                <h6 class="btn btn-secondary dropdown-toggle" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">Por disponibilidad</h6>
+                <ul class="dropdown-menu">
+                    <li><a id="status-true" class="dropdown-item" href="">Disponibles</a></li>
+                    <li><a id="status-false" class="dropdown-item" href="">Consultar Stock</a></li>
+                </ul>
+            </div>
+            <div class="p-2">
+                <a id="delete-filters" type="button" class="btn btn-outline-secondary" href="">Borrar
+                    filtros</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container" id="products-container">
+    {{#each products.payload}}
+    <div class="card" style="width: 18rem;">
+        <img src="{{this.thumbnails.[0]}}" class="card-img-top" alt="{{this.description}}">
+
+        {{#if this.status}}
+        <p class="card-img-overlay aviable bg-success">Disponible</p>
+        {{else}}
+        <p class="card-img-overlay unaviable bg-secondary">Consultar Stock</p>
+        {{/if}}
+
+        <div class="card-body">
+            <h5 class="card-title">{{this.title}}</h5>
+            <p class="card-text">{{this.description}}</p>
+            <h5 class="card-title">${{this.price}}</h5>
+            <p class="card-text">Categoria: {{this.category}}</p>
+
+            {{#if this.status}}
+            <p class="card-text">Stock: <span class="stock" data-product-id="{{this._id}}">{{this.stock}}</span></p>
+            {{else}}
+            <p class="card-text">Stock: <span class="stock" data-product-id="{{this._id}}">0</span></p>
+            {{/if}}
+            <a href="/product/{{this._id}}" class="btn btn-primary">Ver más</a>
+
+            {{#if this.status}}
+            <button class="btn btn-dark addToCart" data-product-id="{{this._id}}">Agregar al
+                carrito</button>
+            {{else}}
+            <button class="btn btn-dark addToCart disabled" data-product-id="{{this._id}}">Agregar al carrito</button>
+            {{/if}}
+
+            <div class="d-flex flex-row counter rounded">
+                <button class="minus round-left" data-product-id="{{this._id}}">-</button>
+
+                <span class="number bg-secondary" data-product-id="{{this._id}}">0</span>
+
+                <button class="add round-right" data-product-id="{{this._id}}">+</button>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>
+
+<div class="d-flex justify-content-center">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            {{#if products.prevLink}}
+            <li class="page-item"><a class="page-link" href="{{products.prevLink}}">Anterior</a></li>
+            {{else}}
+            <li class="page-item disabled"><span class="page-link" href="{{products.prevLink}}">Anterior</span></li>
+            {{/if}}
+
+            {{#each products.totalPagesArray}}
+            <li class="page-item"><a class="page-link" href="/?page={{this}}">{{this}}</a></li>
+            {{/each}}
+
+            {{#if products.nextLink}}
+            <li class="page-item"><a class="page-link" href="{{products.nextLink}}">Siguiente</a></li>
+            {{else}}
+            <li class="page-item disabled"><span class="page-link" href="{{products.nextLink}}">Siguiente</span>
+            </li>
+            {{/if}}
+        </ul>
+    </nav>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../public/products.js"></script>

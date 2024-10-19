@@ -1,0 +1,42 @@
+<div class="container">
+    <h1>Login</h1>
+    <form id="loginForm" class="form-group w-50">       
+        <label class="form-label">Email</label>
+        <input type="text" name="email" class="form-control">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control"> <!-- Cambiado a type="password" para ocultar la contraseña -->
+        <input class="btn btn-outline-dark mt-3 w-100" type="submit" value="Login">
+    </form>
+    <a href="/session/github">Registrarse con GitHub</a>
+    <form action="/mail" method="POST">
+        <label for="email">Correo Electrónico:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+        <input type="submit" value="Recuperar Contraseña">
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+    $(document).ready(function() {
+        $('#loginForm').submit(function(event) {
+            event.preventDefault(); // Evitar el envío predeterminado del formulario
+
+            // Realizar la solicitud de inicio de sesión con AJAX
+            $.post('/session/login', $(this).serialize(), function(response) {
+                if (response.status === 'success') {
+                    // Si el inicio de sesión es exitoso, redirigir al usuario a /realtimeproducts
+                    window.location.href = response.redirectTo;
+                } else {
+                    // Si el inicio de sesión falla, mostrar un mensaje de error
+                    alert('Usuario o contraseña incorrectos');
+                }
+            });
+        
+        });
+
+        
+
+    
+});
+</script>

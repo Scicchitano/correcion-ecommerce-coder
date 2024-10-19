@@ -1,0 +1,21 @@
+<h1>Listado de todos los productos</h1>
+
+<pre id="jsonData"></pre>
+
+
+
+
+<script>
+    
+
+    // Realiza una solicitud al servidor para obtener los datos JSON de forma asíncrona
+    // Realiza una solicitud al servidor para obtener los datos JSON de forma asíncrona
+    async function sendGetRequest() {
+        const response = await fetch('http://localhost:8080/api/products', { method: 'GET' });
+        const jsonData = await response.json();
+        console.log('Mensajes recibidos:',JSON.stringify(jsonData.payload, null, 2));
+        document.getElementById('jsonData').textContent = JSON.stringify(jsonData.payload, null, 2);
+    }
+
+    sendGetRequest();
+</script>

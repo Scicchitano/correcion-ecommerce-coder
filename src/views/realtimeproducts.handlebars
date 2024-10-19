@@ -1,0 +1,237 @@
+<h1 id="welcomeMessage"></h1>
+{{!-- Botón de logout --}}
+<button id="logoutButton">Logout</button>
+
+<button onclick="showAddProductForm()">Agregar producto</button>
+
+<form id="addProductForm" style="display: none;">
+  <label for="title">Título:</label>
+  <input type="text" id="title" name="title" required><br>
+  
+  <label for="description">Descripción:</label>
+  <input type="text" id="description" name="description" required><br>
+  
+  <label for="code">Código:</label>
+  <input type="text" id="code" name="code" required><br>
+  
+  <label for="price">Precio:</label>
+  <input type="text" id="price" name="price" required><br>
+  
+  <label for="status">Estado:</label>
+  <select id="status" name="status">
+    <option value="true">Activo</option>
+    <option value="false">Inactivo</option>
+  </select><br>
+  
+  <label for="stock">Stock:</label>
+  <input type="number" id="stock" name="stock" required><br>
+  
+  <label for="category">Categoría:</label>
+  <input type="text" id="category" name="category" required><br>
+  
+  <label for="owner">Propietario:</label>
+  <input value= type="email" id="owner" name="owner" readonly><br>
+  
+  <label for="thumbnails">Imágenes:</label>
+  <input type="text" id="thumbnails" name="thumbnails" required><br>
+  
+  <button type="button" onclick="sendAddProductRequest()">Agregar Producto</button>
+</form>
+
+
+
+<form id="deleteForm">
+  <label for="productId">ID del Producto a eliminar:</label>
+  <input type="text" id="productId" name="productId" required>
+  <button type="button" onclick="sendDeleteRequest()">Eliminar Producto</button>
+</form>
+
+{{!-- Muestra un mensaje de bienvenida con el nombre del usuario --}}
+
+
+
+{{!-- <button onclick="enviarMensaje()">all products</button> --}}
+
+<h2>Datos del archivo JSON:</h2>
+<pre id="jsonData"></pre>
+
+
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+<script src="../utils/sendEmail.js"></script>
+<script>
+    
+    
+    
+    const socket = io.connect('http://localhost:8080');
+
+    socket.on('connect', () => {
+        console.log('Conectado al servidor');
+    });
+
+    socket.on('messageLogs', mensajes => {
+        //console.log('Mensajes recibidos:', mensajes);
+    });
+    socket.on('message', data => {
+        //console.log('Mensajes recibidos:', data);
+        document.getElementById('jsonData').textContent = data;
+    })
+
+
+    function showAddProductForm() {
+        document.getElementById("addProductForm").style.display = "block";
+        // Actualizando el valor del campo de propietario en el formulario
+        document.getElementById("owner").value = getParameterByName('email');
+    }
+
+    function sendAddProductRequest() {
+    var formData = {
+        title: document.getElementById("title").value,
+        description: document.getElementById("description").value,
+        code: document.getElementById("code").value,
+        price: document.getElementById("price").value,
+        status: document.getElementById("status").value,
+        stock: document.getElementById("stock").value,
+        category: document.getElementById("category").value,
+        owner: document.getElementById("owner").value,
+        thumbnails: [document.getElementById("thumbnails").value]
+    };
+
+    
+
+    // Aquí deberías hacer la solicitud POST al servidor con los datos del formulario
+    // Por simplicidad, mostraré los datos en la consola en lugar de hacer una solicitud real
+    console.log("Datos del nuevo producto:", formData);
+
+    // Limpia el formulario después de enviar la solicitud
+    document.getElementById("addProductForm").reset();
+
+
+    // Construyendo el cuerpo de la solicitud
+    var requestBody = JSON.stringify(formData);
+
+    // Realizando la solicitud POST
+    fetch('http://localhost:8080/api/products', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: requestBody
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Respuesta del servidor:', data);
+    })
+    .catch(error => {
+    console.error('Error al enviar la solicitud:', error);
+    });
+    }
+
+
+
+    // Realiza una solicitud al servidor para obtener los datos JSON de forma asíncrona
+    // Realiza una solicitud al servidor para obtener los datos JSON de forma asíncrona
+    async function sendGetRequest() {
+      const response = await fetch('http://localhost:8080/api/products', { method: 'POST' });
+      const data = await response.text();
+      console.log(data);
+    }
+
+    async function sendDeleteRequest(req, res) {
+        var email = getParameterByName('email');
+        var role = getParameterByName('role');
+        console.log(email, role);
+        let isAllowed2Delete = false;
+        const productId = document.getElementById('productId').value;
+
+        const product = await fetch(`http://localhost:8080/api/products/${productId}`, { method: 'GET' });    
+        const dataProduct = await product.json();
+        const productTitle = dataProduct.payload.title;
+        console.log("productTitle: " + productTitle);
+        const productOwner = dataProduct.payload.owner
+        console.log("productOwner: " + productOwner);
+        if(role == 'admin') {
+            isAllowed2Delete = true;
+        }else{
+            console.log("El producto pertenece a : " + productOwner + "y usted es : " + email);
+            if(email == productOwner){
+                console.log("El producto le pertenece");
+                isAllowed2Delete = true;
+            }
+        } 
+
+        if(isAllowed2Delete){
+
+            const response = await fetch(`http://localhost:8080/api/products/${productId}`, { method: 'DELETE' });
+            const data = await response.text();
+            console.log(data);
+            
+            
+            const emailRequest = {
+                email: productOwner,
+                productTitle: productTitle
+            };
+
+            fetch("http://localhost:8080/mail/productDeleted", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(emailRequest)
+            })
+            .then(response => response.text())
+            .then(result => console.log(result))
+            .catch(error => console.log('Error al enviar el correo electrónico:', error));
+            
+            
+            console.log("Producto eliminado");
+        }else{
+
+            console.log("NO ESTA AUTORIZADO PARA ELIMINAR ESTE PRODUCTO");
+        }
+    }
+
+
+    // Función para obtener el valor de un parámetro de la URL por nombre
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    // Obtener el nombre de usuario de la URL y mostrar un mensaje de bienvenida si está presente
+    document.addEventListener('DOMContentLoaded', function() {
+        var email = getParameterByName('email');
+        var role = getParameterByName('role');
+
+        console.log("role: " + role);
+        if (email) {
+            console.log("role: " + role);
+            document.getElementById('welcomeMessage').textContent = 'Bienvenidd@, ' + email + '!\n Usted es usuario ' + role;
+            /*if(admin === 'true') {
+                console.log("admin");
+                document.getElementById('welcomeMessage').textContent = 'Bienvenidd@, ' + name + '!\n Usted es ADMINISTRADOR' ;
+            } else {
+                console.log("NO es admin");
+                document.getElementById('welcomeMessage').textContent = 'Bienvenid@,'+ name + '!\n Usted no es ADMINISTRADOR' ;
+            }*/
+        }
+
+      // Asignar la función de logout al evento click del botón de logout
+      document.getElementById('logoutButton').addEventListener('click', logout);
+    });
+
+     // Función para manejar el logout
+    function logout() {
+        // Realizar una solicitud al servidor para cerrar la sesión
+        fetch('/session/logout', { method: 'GET' })
+            .then(response => {
+                // Redirigir a la página de inicio de sesión
+                window.location.href = '/login';
+            })
+            .catch(error => {
+                console.error('Error al cerrar la sesión:', error);
+            });
+    }
+</script>

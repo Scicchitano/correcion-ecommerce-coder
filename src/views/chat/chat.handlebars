@@ -1,0 +1,33 @@
+<div>
+    <h1>bienvenidos a socket</h1>
+</div>
+<div>
+    <label for="userName">USUARIO:</label>
+    <input type="text" id="userName" name="userName" required>
+    <label for="message">MENSAJE:</label>
+    <input type="text" id="message" name="message" required>
+    <button type="button" onclick="sendRequest()">Enviar</button>
+</div>
+<div id="messageLogs"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="../../public/chat.js"></script>
+
+<script>
+async function sendRequest() {
+    const chatForm = {
+      user:document.getElementById('userName').value ,
+      message:document.getElementById('message').value      
+    };
+    const response = await fetch(`http://localhost:8080/api/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify(chatForm), 
+    });
+
+    console.log(response);
+}
+</script>

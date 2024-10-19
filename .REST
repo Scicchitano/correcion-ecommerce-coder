@@ -1,0 +1,116 @@
+##          Rutas de Carts          ##
+
+### Te genera un nuevo producto vacio con un nuevo id
+POST http://localhost:8080/api/carts
+Content-Type: application/json
+
+{
+  "product": "Ejemplo18",
+  "price": 14,
+  "quantity": 3
+}
+### Consulta por un id especifico y te devuelve el producto
+GET http://localhost:8080/api/carts/11
+### agrego un nuevo producto al id existente
+POST http://localhost:8080/api/carts/11/products/560
+
+
+##          Rutas de Products          ##
+
+
+### Te genera un nuevo producto vacio con un nuevo id
+POST http://localhost:8080/api/products
+### Te trae todos los productos
+GET http://localhost:8080/api/products
+### Te trae todos los productos hasta un limite
+GET http://localhost:8080/api/products?limit=5
+### Consulta por un id especifico y te devuelve el producto
+GET http://localhost:8080/api/products/17
+### Consulta por un id especifico y te devuelve el producto
+PUT http://localhost:8080/api/products/60
+Content-Type: application/json
+
+{
+  "title": "Ejemplo18",
+  "description": "Descripción de ejemplo",
+  "code": "1216",
+  "price": 19.99,
+  "status": true,
+  "stock": 50,
+  "category": "EjemploCategory",
+  "thumbnails": "https://ejemplo.com/thumbnail.jpg"
+}
+
+### Elimino un producto existente
+DELETE http://localhost:8080/api/products/57
+
+
+### Te trae todos los productos
+GET http://localhost:8080/api/users
+
+
+
+##          Rutas de Carts          ##
+
+### Te genera
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ #un nuevo producto vacio con un nuevo id
+GET http://localhost:8080/realtimeproducts
+
+
+
+
+
+
+
+
+
+
+###
+POST http://localhost:8080/session/login 
+Content-Type: application/json
+
+{
+  "email": "f@gmail.com", 
+  "password": "123456"
+}
+
+###
+POST http://localhost:8080/session/login 
+Content-Type: application/json
+
+{
+  "email": "ari@gmail.com", 
+  "password": "nose"
+}
+
+
+###
+POST http://localhost:8080/session/register 
+Content-Type: application/json
+
+{
+  "first_name": "nose", 
+  "last_name": "nose2", 
+  "email": "f@gmail.com", 
+  "password": "123456"
+}
+
+
+###
+GET http://localhost:8080/session/logout
